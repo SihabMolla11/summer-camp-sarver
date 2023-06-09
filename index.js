@@ -39,6 +39,32 @@ async function run() {
             }
             const result = await usersCollection.insertOne(user)
             res.send(result)
+        });
+
+        // get Users
+        app.get("/users", async (req, res) => {
+            const result = await usersCollection.find().toArray();
+            res.send(result)
+        })
+
+        // instuctor user
+        app.put("/users/:email", async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const query = { email: email }
+            const updateDoc = {
+                $set: user,
+            }
+            const result = await usersCollection.updateOne(query, updateDoc);
+            res.send(result)
+        });
+
+        // get a instructor
+        app.get("/users/:email", async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email }
+            const result = await usersCollection.findOne(query)
+            res.send(result)
         })
 
 
