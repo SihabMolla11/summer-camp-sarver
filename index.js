@@ -27,6 +27,7 @@ async function run() {
     try {
         // await client.connect();
         const usersCollection = client.db('Summercamp').collection('Users')
+        const classCollection = client.db('Summercamp').collection('Classes')
 
 
         // user collections
@@ -62,10 +63,33 @@ async function run() {
         // get a instructor
         app.get("/users/:email", async (req, res) => {
             const email = req.params.email;
+            // console.log(email)
             const query = { email: email }
             const result = await usersCollection.findOne(query)
             res.send(result)
+        });
+
+
+        // add class
+        app.post("/classes", async (req, res) => {
+            const newClass = req.body;
+            const result = await classCollection.insertOne(newClass)
+            res.send(result)
+        });
+
+
+        // get my classes
+        app.get("/my-classes", async (req, res) => {
+            const email = req.query?.email
+            let query = {}
+            if (email) {
+                query = { email: email }
+            }
+            const result = await classCollection.find(query).toArray()
+            res.send(result)
         })
+
+
 
 
 
