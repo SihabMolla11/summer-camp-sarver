@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 
 
 // mongodb code start
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const uri = `mongodb+srv://${process.env.SUMMER_CAMP_USER}:${process.env.SUMMER_CAMP_PASSWORD}@cluster0.pphnrsn.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -77,6 +77,11 @@ async function run() {
             res.send(result)
         });
 
+        // delete my class
+        app.get("/allClasses", async (req, res) => {
+            const result = await classCollection.find().toArray()
+            res.send(result)
+        });
 
         // get my classes
         app.get("/my-classes", async (req, res) => {
@@ -87,7 +92,16 @@ async function run() {
             }
             const result = await classCollection.find(query).toArray()
             res.send(result)
+        });
+
+        // delete a class 
+        app.delete("/allClasses/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await classCollection.deleteOne(query)
+            res.send(result)
         })
+
 
 
 
