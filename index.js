@@ -94,7 +94,7 @@ async function run() {
             res.send(result)
         });
 
-        // delete a class 
+        // delete a class
         app.delete("/allClasses/:id", async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
@@ -102,6 +102,20 @@ async function run() {
             res.send(result)
         })
 
+
+        // get instructors
+        app.get("/instructors", async (req, res) => {
+            const role = req.query?.role
+            if(!role==="instructors"){
+                res.send([])
+            }
+            let query = {}
+            if (role) {
+                query = { role: role }
+            }
+            const result = await usersCollection.find(query).toArray()
+            res.send(result)
+        })
 
 
 
