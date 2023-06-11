@@ -42,7 +42,7 @@ async function run() {
             res.send(result)
         });
 
-        // get Users
+        // get All Users
         app.get("/users", async (req, res) => {
             const result = await usersCollection.find().toArray();
             res.send(result)
@@ -77,7 +77,7 @@ async function run() {
             res.send(result)
         });
 
-        // delete my class
+        // get all classes
         app.get("/allClasses", async (req, res) => {
             const result = await classCollection.find().toArray()
             res.send(result)
@@ -100,13 +100,20 @@ async function run() {
             const query = { _id: new ObjectId(id) }
             const result = await classCollection.deleteOne(query)
             res.send(result)
-        })
+        });
 
+        // gea a class by a id
+        app.get("/singleClass/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await classCollection.findOne(query);
+            res.send(result)
+        });
 
         // get instructors
         app.get("/instructors", async (req, res) => {
             const role = req.query?.role
-            if(!role==="instructors"){
+            if (!role === "instructors") {
                 res.send([])
             }
             let query = {}
@@ -115,7 +122,20 @@ async function run() {
             }
             const result = await usersCollection.find(query).toArray()
             res.send(result)
-        })
+        });
+
+        // updata class
+        app.put("/singleClass/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const newClass = req.body;
+            const updateClass = {
+                $set: newClass
+
+            }
+            const result = await classCollection.updateOne(query, updateClass)
+            res.send(result)
+        });
 
 
 
@@ -135,4 +155,4 @@ run().catch(console.dir);
 
 app.listen(port, () => {
     console.log(`summer camp sarver running ${port}`)
-})
+});
