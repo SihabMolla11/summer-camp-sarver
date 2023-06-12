@@ -28,6 +28,7 @@ async function run() {
         // await client.connect();
         const usersCollection = client.db('Summercamp').collection('Users')
         const classCollection = client.db('Summercamp').collection('Classes')
+        const selectedClassesCollection = client.db('Summercamp').collection('SelectedClasses')
 
 
         // user collections
@@ -46,7 +47,7 @@ async function run() {
         app.get("/users", async (req, res) => {
             const result = await usersCollection.find().toArray();
             res.send(result)
-        })
+        });
 
         // instuctor user
         app.put("/users/:email", async (req, res) => {
@@ -59,6 +60,9 @@ async function run() {
             const result = await usersCollection.updateOne(query, updateDoc);
             res.send(result)
         });
+
+
+
 
         // get a instructor
         app.get("/users/:email", async (req, res) => {
@@ -138,8 +142,45 @@ async function run() {
         });
 
 
+        // Selected class add
+        // app.post("/selectedClasses", async (req, res) => {
+        //     const newClass = req.body;
+        //     const query = { Classid: newClass.Classid, email: newClass.email }
+        //     const ExistingUser = await selectedClassesCollection.findOne(query)
+        //     if (ExistingUser) {
+        //         res.send({ message: "the class allrady existing" })
+        //     }
+        //     else {
+        //         const result = await selectedClassesCollection.insertOne(newClass)
+        //         res.send(result)
+        //     }
+        // });
 
+        app.post("/selectedClasses", async (req, res) => {
+            const newClass = req.body;
+            const result = await selectedClassesCollection.insertOne(newClass)
+            res.send(result)
+        });
 
+        // get selected class
+        app.get("/selectedClasses", async (req, res) => {
+            const email = req.query?.email
+            // console.log(email)
+            let query = {}
+            if (email) {
+                query = { email: email }
+            }
+            const result = await selectedClassesCollection.find(query).toArray()
+            res.send(result)
+        });
+
+        // delete selectd class
+        app.delete("/stlClass/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await selectedClassesCollection.deleteOne(query);
+            res.send(result);
+        });
 
 
 
