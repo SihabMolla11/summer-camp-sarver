@@ -30,6 +30,7 @@ async function run() {
         const usersCollection = client.db('Summercamp').collection('Users')
         const classCollection = client.db('Summercamp').collection('Classes')
         const selectedClassesCollection = client.db('Summercamp').collection('SelectedClasses')
+        const paymentCollection = client.db('Summercamp').collection('Payments')
 
 
         // user collections
@@ -61,9 +62,6 @@ async function run() {
             const result = await usersCollection.updateOne(query, updateDoc);
             res.send(result)
         });
-
-
-
 
         // get a instructor
         app.get("/users/:email", async (req, res) => {
@@ -195,7 +193,7 @@ async function run() {
         app.post("/payment-intent", async (req, res) => {
             const { price } = req.body;
             const amount = price * 100;
-            console.log(price, amount)
+            // console.log(price, amount)
             const paymentIntent = await stripe.paymentIntents.create({
                 amount: amount,
                 currency: "usd",
@@ -207,7 +205,27 @@ async function run() {
         });
 
 
+        // Payment data post
+        app.post("/payments", async (req, res) => {
+            const payment = req.body;
+            const result = await paymentCollection.insertOne(payment)
+            const query = { Classid: payment.Classid }
+            // console.log(query)
+            const deleteResult = selectedClassesCollection.deleteMany(query)
+            res.send({ result, deleteResult })
+        });
 
+        // get payment information
+        app.get("/payments", async (req, res) => {
+            let query = {}
+            const email = req.query.email
+            console.log(email)
+            if (email) {
+                query = { email: email }
+            }
+            const result = await paymentCollection.find(query).toArray()
+            res.send(result)
+        });
 
 
 
